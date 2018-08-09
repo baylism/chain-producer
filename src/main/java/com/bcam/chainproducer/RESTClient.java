@@ -2,7 +2,6 @@ package com.bcam.chainproducer;
 
 
 import com.bcam.bcmonitor.extractor.rpc.ReactiveHTTPClient;
-import com.bcam.bcmonitor.model.BitcoinBlock;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -31,11 +30,11 @@ public class RESTClient {
         client = new ReactiveHTTPClient(hostName, port);
     }
 
-    public Mono<BitcoinBlock> getBlock() {
-        return client
-                .requestResponseSpec("dash", "block", "000000000000003941fb8b64f23b1dc0391892c87dd8054a1f262b70203b2582")
-                .bodyToMono(BitcoinBlock.class);
-    }
+    // public Mono<BitcoinBlock> getBlock() {
+    //     return client
+    //             .requestResponseSpec("dash", "block", "000000000000003941fb8b64f23b1dc0391892c87dd8054a1f262b70203b2582")
+    //             .bodyToMono(BitcoinBlock.class);
+    // }
 
     // public Mono<String> getInfo(String blockchain) {
     //     return client

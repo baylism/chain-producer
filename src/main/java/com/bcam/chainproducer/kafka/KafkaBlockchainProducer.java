@@ -1,4 +1,4 @@
-package com.bcam.chainproducer;
+package com.bcam.chainproducer.kafka;
 
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
@@ -9,6 +9,10 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Properties;
 
+
+/**
+ *
+ */
 @Component
 public class KafkaBlockchainProducer {
 
