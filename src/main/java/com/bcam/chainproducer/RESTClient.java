@@ -42,9 +42,9 @@ public class RESTClient {
     //             .bodyToMono(String.class);
     // }
 
-    public Mono<String> getInfo(String blockchain) {
-        return Mono.just("MESSAGE FROM CLIENT");
-    }
+    // public Mono<String> getInfo(String blockchain) {
+    //     return Mono.just("MESSAGE FROM CLIENT");
+    // }
 
 }
 
