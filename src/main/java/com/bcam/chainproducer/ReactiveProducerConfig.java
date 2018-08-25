@@ -27,20 +27,17 @@ public class ReactiveProducerConfig {
     private String bootstrapServers;
 
     @Bean
-    public Map<String, Object> producerProps(Serializer<Blockchain> blockchainSerializer, Serializer<BitcoinBlock> bitcoinBlockSerializer) {
+    public Map<String, Object> producerProps() {
 
         logger.info("Bootstrap is " + bootstrapServers);
-
-
 
         Map<String, Object> props = new HashMap<>();
 
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
 
         props.put(ProducerConfig.CLIENT_ID_CONFIG, "chain-producer");
-        // props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, blockchainSerde.getClass().getName());
-        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, blockchainSerializer.getClass().getName());
-        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, bitcoinBlockSerializer.getClass().getName());
+        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
         props.put(ProducerConfig.ACKS_CONFIG, "all");
         props.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, Long.MAX_VALUE);
         props.put(ProducerConfig.RETRIES_CONFIG, Integer.MAX_VALUE);
@@ -48,19 +45,6 @@ public class ReactiveProducerConfig {
         return props;
     }
 
-    @Bean
-    public Serializer<BitcoinBlock> bitcoinBlockSerializer() {
-
-        Map<String, Object> serdeProps = new HashMap<>();
-        serdeProps.put("JsonPOJOClass", BitcoinBlock.class);
-
-        Serializer<BitcoinBlock> blockSerializer = new JsonPOJOSerializer<>();
-
-        blockSerializer.configure(serdeProps, false);
-
-        return blockSerializer;
-
-    }
 
     @Bean
     public Serde<BitcoinBlock> blockSerde() {
@@ -75,20 +59,6 @@ public class ReactiveProducerConfig {
         blockDeserializer.configure(serdeProps, false);
 
         return Serdes.serdeFrom(blockSerializer, blockDeserializer);
-    }
-
-    @Bean
-    public Serializer<Blockchain> blockchainSerializer() {
-
-        Map<String, Object> serdeProps = new HashMap<>();
-        serdeProps.put("JsonPOJOClass", Blockchain.class);
-
-        Serializer<Blockchain> serializer = new JsonPOJOSerializer<>();
-
-        serializer.configure(serdeProps, true);
-
-        return serializer;
-
     }
 
 

@@ -5,6 +5,7 @@ import com.bcam.bcmonitor.model.Blockchain;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
+import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,17 +19,13 @@ import reactor.kafka.sender.SenderRecord;
 
 import java.util.Map;
 
-@Lazy
 @Component
 public class ReactiveKafkaProducer {
 
     private static final Logger logger = LoggerFactory.getLogger(ReactiveKafkaProducer.class);
 
-    // @Value("${spring.kafka.bootstrap-servers}")
-    // private String bootstrapServers;
-
-    private final SenderOptions<Blockchain, BitcoinBlock> senderOptions;
-    private final KafkaSender<Blockchain, BitcoinBlock> sender;
+    private SenderOptions<String, String> senderOptions;
+    private KafkaSender<String, String> sender;
 
 
     @Autowired
@@ -36,15 +33,35 @@ public class ReactiveKafkaProducer {
 
         logger.info("Building producer with bootstrap ");
 
-        // props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-
-        senderOptions = SenderOptions.create(producerProps);
-        sender = KafkaSender.create(senderOptions);
+        // senderOptions = SenderOptions.create(producerProps);
+        // sender = KafkaSender.create(senderOptions);
 
     }
 
+    public void rebuildSender(Map<String, Object> producerProps, String bootstrap) {
 
-    public Flux<?> send(Flux<BitcoinBlock> source, String topic, Blockchain key) {
+
+        producerProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrap);
+        producerProps.put(ProducerConfig.CLIENT_ID_CONFIG, "chain-producer");
+        producerProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        producerProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        producerProps.put(ProducerConfig.ACKS_CONFIG, "all");
+        producerProps.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, Long.MAX_VALUE);
+        producerProps.put(ProducerConfig.RETRIES_CONFIG, Integer.MAX_VALUE);
+
+
+        senderOptions = SenderOptions.create(producerProps);
+
+        logger.info("Rebuilding producer with bootstrap " + producerProps.get(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG));
+
+
+        sender = KafkaSender.create(senderOptions);
+    }
+
+
+
+
+    public Flux<?> send(Flux<String> source, String topic, String key) {
 
         return sender
                 .send(
@@ -53,9 +70,9 @@ public class ReactiveKafkaProducer {
                 .doOnError(e -> logger.error("Send failed, terminating.", e))
                 // .doOnNext(r -> System.out.println("Message #" + r.correlationMetadata() + " metadata=" + r.recordMetadata()))
                 .doOnNext(r -> {
-                    Blockchain correlationMetadata = r.correlationMetadata();
+                    String correlationMetadata = r.correlationMetadata();
                     RecordMetadata metadata = r.recordMetadata();
-                    logger.info("Successfully stored block with id {0} and record {1} in Kafka", correlationMetadata, metadata);
+                    logger.info("Successfully stored block with id " + correlationMetadata + " and record "+ metadata + " in Kafka");
                 })
                 .doOnCancel(sender::close);
     }

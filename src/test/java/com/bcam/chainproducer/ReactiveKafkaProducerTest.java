@@ -8,7 +8,10 @@ import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.Serde;
+import org.apache.kafka.common.serialization.StringDeserializer;
+import org.apache.kafka.common.serialization.StringSerializer;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -60,6 +63,9 @@ public class ReactiveKafkaProducerTest {
     @Autowired
     private ReactiveKafkaProducer producer;
 
+    @Autowired
+    private Map<String, Object> producerProps;
+
     @BeforeClass
     public static void setUpBeforeClass() {
         System.setProperty("spring.kafka.bootstrap-servers", embeddedKafka.getBrokersAsString());
@@ -74,24 +80,21 @@ public class ReactiveKafkaProducerTest {
     @Test
     public void send() throws Exception {
 
-        // String block1 = "{\"hash\":\"00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048\",\"prevBlockHash\":\"000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f\",\"height\":1,\"timeStamp\":1231469665,\"sizeBytes\":215,\"difficulty\":1,\"timeReceived\":1535205363,\"txids\":[\"0e3e2357e806b6cdb1f70b54c3a3a17b6714ee1f0e68bebb44a74b1efd512098\"],\"medianTime\":0,\"chainWork\":8590065666,\"confirmations\":538401}";
-        //
-        // String block2 = "{\"hash\":\"0000000082b5015589a3fdf2d4baff403e6f0be035a5d9742c1cae6295464449\",\"prevBlockHash\":\"000000006a625f06636b8bb6ac7b960a8d03705d1ace08b1a19da3fdcc99ddbd\",\"height\":3,\"timeStamp\":1231470173,\"sizeBytes\":215,\"difficulty\":1,\"timeReceived\":1535205363,\"txids\":[\"999e1c837c76a1b7fbb7e57baf87b309960f5ffefbf2a9b95dd890602272f644\"],\"medianTime\":0,\"chainWork\":17180131332,\"confirmations\":538399}";
+        String block1 = "{\"hash\":\"00000000839a8e6886ab5951d76f411475428afc90947ee320161bbf18eb6048\",\"prevBlockHash\":\"000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f\",\"height\":1,\"timeStamp\":1231469665,\"sizeBytes\":215,\"difficulty\":1,\"timeReceived\":1535205363,\"txids\":[\"0e3e2357e806b6cdb1f70b54c3a3a17b6714ee1f0e68bebb44a74b1efd512098\"],\"medianTime\":0,\"chainWork\":8590065666,\"confirmations\":538401}";
+
+        String block2 = "{\"hash\":\"0000000082b5015589a3fdf2d4baff403e6f0be035a5d9742c1cae6295464449\",\"prevBlockHash\":\"000000006a625f06636b8bb6ac7b960a8d03705d1ace08b1a19da3fdcc99ddbd\",\"height\":3,\"timeStamp\":1231470173,\"sizeBytes\":215,\"difficulty\":1,\"timeReceived\":1535205363,\"txids\":[\"999e1c837c76a1b7fbb7e57baf87b309960f5ffefbf2a9b95dd890602272f644\"],\"medianTime\":0,\"chainWork\":17180131332,\"confirmations\":538399}";
 
 
-        BitcoinBlock block1 = new BitcoinBlock("hash1", 1L);
-        BitcoinBlock block2 = new BitcoinBlock("hash2", 2L);
 
 
         //    create producer and produce
 
-        Flux<BitcoinBlock> source = Flux.just(block1, block2);
+        Flux<String> source = Flux.just(block1, block2);
 
-        // Map<String, Object> producerProps = KafkaTestUtils.producerProps(embeddedKafka);
+        producer.rebuildSender(producerProps, brokerAddresses);
 
-        // ReactiveKafkaProducer producer = new ReactiveKafkaProducer(producerProps);
 
-        Disposable result = producer.send(source, TOPIC, Blockchain.BITCOIN).subscribe();
+        Disposable result = producer.send(source, TOPIC, "BITCOIN").subscribe();
 
 
         while (! result.isDisposed()) {
@@ -105,25 +108,26 @@ public class ReactiveKafkaProducerTest {
                 embeddedKafka
         );
 
-        consumerProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
-        ConsumerFactory<Blockchain, BitcoinBlock> consumerFactory = new DefaultKafkaConsumerFactory<>(
-                consumerProps,
-                blockchainSerde.deserializer(),
-                blockSerde.deserializer()
+        consumerProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+        consumerProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        consumerProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+
+        ConsumerFactory<String, String> consumerFactory = new DefaultKafkaConsumerFactory<>(
+                consumerProps
         );
 
-        Consumer<Blockchain, BitcoinBlock> inputConsumer = consumerFactory.createConsumer();
+        Consumer<String, String> inputConsumer = consumerFactory.createConsumer();
         embeddedKafka.consumeFromAnEmbeddedTopic(inputConsumer, TOPIC);
 
-        ConsumerRecords<Blockchain, BitcoinBlock> received = KafkaTestUtils.getRecords(inputConsumer);
+        ConsumerRecords<String, String> received = KafkaTestUtils.getRecords(inputConsumer);
 
         // assertEquals(4, received.count());
         //
         // assertThat(received.iterator().next().value(), equalTo(bitcoinPool1));
 
 
-        for (ConsumerRecord<Blockchain, BitcoinBlock> s : received) {
+        for (ConsumerRecord<String, String> s : received) {
             logger.info("Received on input topic " + TOPIC + " Key: " + s.key() + " Value: " + s.value());
         }
 
