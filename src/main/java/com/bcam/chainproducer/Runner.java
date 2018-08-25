@@ -7,24 +7,22 @@ import org.springframework.stereotype.Component;
 @Component
 public class Runner implements CommandLineRunner {
 
-    private RESTPoller poller;
+
+    private Extractor extractor;
+
 
     @Autowired
-    public Runner(RESTPoller poller) {
-        this.poller = poller;
+    public Runner(Extractor extractor) {
+
+        this.extractor = extractor;
     }
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
 
-
-        for (int i = 2; i > 0; i--) {
-
-            // poller.subscribeInfo();
-            // poller.subscribeBlocks();
-
-            Thread.sleep(1000L);
-
-        }
+        extractor.forwardBitcoinBlocks(0L, 100L);
     }
+
+
+
 }

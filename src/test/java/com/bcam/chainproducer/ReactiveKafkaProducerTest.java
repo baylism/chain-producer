@@ -47,11 +47,6 @@ public class ReactiveKafkaProducerTest {
 
     private static final String TOPIC = "blocks";
 
-    @Autowired
-    private Serde<BitcoinBlock> blockSerde;
-
-    @Autowired
-    private Serde<Blockchain> blockchainSerde;
 
     @ClassRule
     public static KafkaEmbedded embeddedKafka = new KafkaEmbedded(
@@ -91,7 +86,8 @@ public class ReactiveKafkaProducerTest {
 
         Flux<String> source = Flux.just(block1, block2);
 
-        producer.rebuildSender(producerProps, brokerAddresses);
+        producer.rebuildSender(brokerAddresses);
+        // producer.rebuildSender();
 
 
         Disposable result = producer.send(source, TOPIC, "BITCOIN").subscribe();

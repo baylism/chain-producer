@@ -1,15 +1,11 @@
 package com.bcam.chainproducer;
 
-import com.bcam.bcmonitor.model.BitcoinBlock;
-import com.bcam.bcmonitor.model.Blockchain;
-import com.bcam.bcmonitor.model.TransactionPool;
-import com.bcam.chainproducer.serde.BlockchainSerdeWrapper;
-import com.bcam.chainproducer.serde.JsonPOJODeserializer;
-import com.bcam.chainproducer.serde.JsonPOJOSerializer;
+
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,6 +21,7 @@ public class ReactiveProducerConfig {
 
     @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapServers;
+
 
     @Bean
     public Map<String, Object> producerProps() {
@@ -45,31 +42,4 @@ public class ReactiveProducerConfig {
         return props;
     }
 
-
-    @Bean
-    public Serde<BitcoinBlock> blockSerde() {
-
-        Map<String, Object> serdeProps = new HashMap<>();
-        serdeProps.put("JsonPOJOClass", BitcoinBlock.class);
-
-        Serializer<BitcoinBlock> blockSerializer = new JsonPOJOSerializer<>();
-        Deserializer<BitcoinBlock> blockDeserializer = new JsonPOJODeserializer<>();
-
-        blockSerializer.configure(serdeProps, false);
-        blockDeserializer.configure(serdeProps, false);
-
-        return Serdes.serdeFrom(blockSerializer, blockDeserializer);
-    }
-
-
-    @Bean
-    public Serde<Blockchain> blockchainSerde(BlockchainSerdeWrapper blockchainSerde) {
-
-        Map<String, Object> serdeProps = new HashMap<>();
-        serdeProps.put("JsonPOJOClass", Blockchain.class);
-        blockchainSerde.configure(serdeProps, true);
-
-        return blockchainSerde;
-
-    }
 }

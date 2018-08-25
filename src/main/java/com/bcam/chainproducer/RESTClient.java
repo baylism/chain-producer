@@ -20,15 +20,20 @@ public class RESTClient {
 
     // @TestPropertySource(properties = {"HOSTNAME=localhost", "PORT=9998"})
 
-    // @Value("${HOSTNAME}")
+    @Value("${HOSTNAME}")
     private String hostName;
 
-    // @Value("${PORT}")
+    @Value("${PORT}")
     private int port;
 
     private ReactiveHTTPClient client;
 
     public RESTClient() {
+
+        // client = new ReactiveHTTPClient(hostName, port);
+
+        // hostName = "35.229.87.236";
+        // port = 80;
 
     }
 
@@ -39,7 +44,7 @@ public class RESTClient {
         client = new ReactiveHTTPClient(hostName, port);
     }
 
-    public Flux<BitcoinBlock> getBlocksProducer(Blockchain blockchain, Long fromHeight, Long toHeight) {
+    public Flux<BitcoinBlock> getBlocksFlux(Blockchain blockchain, Long fromHeight, Long toHeight) {
         return client
                 .getResponseSpec(convertChain(blockchain), "blocks", fromHeight.toString(), toHeight.toString())
                 .bodyToFlux(BitcoinBlock.class);
