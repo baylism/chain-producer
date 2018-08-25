@@ -9,7 +9,7 @@
     <packaging>jar</packaging>
 
     <name>chain-producer</name>
-    <description>Kafka producer to poll chain-dock REST interface</description>
+    <description>Kafka producer to poll bcmonitor REST interface</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -50,6 +50,16 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.projectreactor.kafka</groupId>
+            <artifactId>reactor-kafka</artifactId>
+            <version>1.0.0.RELEASE</version>
+        </dependency>
+        <dependency>
             <groupId>com.bcam</groupId>
             <artifactId>bcmonitor</artifactId>
             <version>0.0.1-snapshot</version>
@@ -66,8 +76,9 @@
             <plugin>
                 <groupId>com.spotify</groupId>
                 <artifactId>dockerfile-maven-plugin</artifactId>
+                <version>1.4.4</version>
                 <configuration>
-                    <repository>baylism/chain-dock</repository>
+                    <repository>baylism/chain-producer</repository>
                     <buildArgs>
                         <JAR_FILE>target/${project.build.finalName}.jar</JAR_FILE>
                     </buildArgs>

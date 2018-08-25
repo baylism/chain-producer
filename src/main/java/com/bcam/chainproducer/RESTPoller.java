@@ -23,21 +23,21 @@ public class RESTPoller {
         blockchains.add("dash");
     }
 
-    public void subscribeInfo() {
-
-        for (String chain : blockchains) {
-            client
-                    .getInfo(chain)
-                    .subscribe(info -> producer.sendData("info", "newInfo", info));
-        }
-    }
-
-    public void subscribeBlocks() {
-        for (String chain : blockchains ) {
-            client
-                    .getInfo("foo")
-                    .subscribe(info -> producer.sendData("info", "newInfo", info));
-        }
-    }
+    // public void subscribeInfo() {
+    //
+    //     for (String chain : blockchains) {
+    //         client
+    //                 .getInfo(chain)
+    //                 .subscribe(info -> producer.sendData("info", "newInfo", info));
+    //     }
+    // }
+    //
+    // public void subscribeBlocks() {
+    //     for (String chain : blockchains ) {
+    //         client
+    //                 .getInfo("foo")
+    //                 .subscribe(info -> producer.sendData("info", "newInfo", info));
+    //     }
+    // }
 
 }

@@ -20,8 +20,8 @@ public class Runner implements CommandLineRunner {
 
         for (int i = 2; i > 0; i--) {
 
-            poller.subscribeInfo();
-            poller.subscribeBlocks();
+            // poller.subscribeInfo();
+            // poller.subscribeBlocks();
 
             Thread.sleep(1000L);
 

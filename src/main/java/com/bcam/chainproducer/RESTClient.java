@@ -2,19 +2,28 @@ package com.bcam.chainproducer;
 
 
 import com.bcam.bcmonitor.extractor.rpc.ReactiveHTTPClient;
+import com.bcam.bcmonitor.model.BitcoinBlock;
+import com.bcam.bcmonitor.model.Blockchain;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.annotation.PostConstruct;
 
+import static com.bcam.bcmonitor.model.Blockchain.BITCOIN;
+import static com.bcam.bcmonitor.model.Blockchain.DASH;
+import static com.bcam.bcmonitor.model.Blockchain.ZCASH;
+
 @Component
 public class RESTClient {
 
-    @Value("${HOSTNAME}")
+    // @TestPropertySource(properties = {"HOSTNAME=localhost", "PORT=9998"})
+
+    // @Value("${HOSTNAME}")
     private String hostName;
 
-    @Value("${PORT}")
+    // @Value("${PORT}")
     private int port;
 
     private ReactiveHTTPClient client;
@@ -30,21 +39,20 @@ public class RESTClient {
         client = new ReactiveHTTPClient(hostName, port);
     }
 
-    // public Mono<BitcoinBlock> getBlock() {
-    //     return client
-    //             .requestResponseSpec("dash", "block", "000000000000003941fb8b64f23b1dc0391892c87dd8054a1f262b70203b2582")
-    //             .bodyToMono(BitcoinBlock.class);
-    // }
+    public Flux<BitcoinBlock> getBlocksProducer(Blockchain blockchain, Long fromHeight, Long toHeight) {
+        return client
+                .getResponseSpec(convertChain(blockchain), "blocks", fromHeight.toString(), toHeight.toString())
+                .bodyToFlux(BitcoinBlock.class);
+    }
 
-    // public Mono<String> getInfo(String blockchain) {
-    //     return client
-    //             .requestResponseSpec(blockchain, "blockchaininfo")
-    //             .bodyToMono(String.class);
-    // }
-
-    // public Mono<String> getInfo(String blockchain) {
-    //     return Mono.just("MESSAGE FROM CLIENT");
-    // }
+    private String convertChain(Blockchain blockchain) {
+        switch (blockchain) {
+            case BITCOIN: return "bitcoin";
+            case ZCASH: return "zcash";
+            case DASH: return "dash";
+            default: throw new RuntimeException("Can't convert blockchain");
+        }
+    }
 
 }
 

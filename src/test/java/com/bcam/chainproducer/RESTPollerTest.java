@@ -21,38 +21,38 @@ public class RESTPollerTest {
 
     private ClientAndServer mockServer;
 
-    @Autowired
-    private RESTPoller poller;
-
-
-    @Before
-    public void startServer() {
-        mockServer = startClientAndServer(6789);
-    }
-
-    @After
-    public void stopServer() {
-        mockServer.stop();
-    }
-
-
-    @Test
-    public void subscribeInfo() {
-        // mockServer = startClientAndServer(6789);
-
-
-        mockServer
-                .when(
-                        request()
-                                .withMethod("GET")
-                )
-                .respond(
-                        response()
-                                .withBody("returned response!")
-                                .withHeader("Content-Type", "text/html")
-                );
-
-        poller.subscribeInfo();
-    }
+    // @Autowired
+    // private RESTPoller poller;
+    //
+    //
+    // @Before
+    // public void startServer() {
+    //     mockServer = startClientAndServer(6789);
+    // }
+    //
+    // @After
+    // public void stopServer() {
+    //     mockServer.stop();
+    // }
+    //
+    //
+    // @Test
+    // public void subscribeInfo() {
+    //     // mockServer = startClientAndServer(6789);
+    //
+    //
+    //     mockServer
+    //             .when(
+    //                     request()
+    //                             .withMethod("GET")
+    //             )
+    //             .respond(
+    //                     response()
+    //                             .withBody("returned response!")
+    //                             .withHeader("Content-Type", "text/html")
+    //             );
+    //
+    //     // poller.subscribeInfo();
+    // }
 
 }
