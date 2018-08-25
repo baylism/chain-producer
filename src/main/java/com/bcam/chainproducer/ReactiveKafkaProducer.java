@@ -86,14 +86,15 @@ public class ReactiveKafkaProducer {
 
         return sender
                 .send(
-                        source.map(s -> SenderRecord.create(new ProducerRecord<>(topic, key, s), key))
+                        source
+                                .doOnNext(x -> logger.info("Got item from source " + x))
+                                .map(s -> SenderRecord.create(new ProducerRecord<>(topic, key, s), key))
                 )
                 .doOnError(e -> logger.error("Send failed, terminating.", e))
-                // .doOnNext(r -> System.out.println("Message #" + r.correlationMetadata() + " metadata=" + r.recordMetadata()))
-                .doOnNext(r -> {
-                    String correlationMetadata = r.correlationMetadata();
-                    RecordMetadata metadata = r.recordMetadata();
-                    logger.info("Successfully stored block with id " + correlationMetadata + " and record "+ metadata + " in Kafka");
+                .doOnNext(record -> {
+                    String correlationMetadata = record.correlationMetadata();
+                    RecordMetadata metadata = record.recordMetadata();
+                    logger.info("Successfully stored block with id " + correlationMetadata + " and record " + metadata + " in Kafka");
                 })
                 .doOnCancel(sender::close);
     }

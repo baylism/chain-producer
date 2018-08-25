@@ -7,8 +7,10 @@ import org.junit.runner.RunWith;
 import org.mockserver.integration.ClientAndServer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import reactor.core.Disposable;
 
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
 import static org.mockserver.model.HttpRequest.request;
@@ -18,7 +20,7 @@ import static org.mockserver.model.HttpResponse.response;
 // port = 80;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootApplication
+@SpringBootTest
 @TestPropertySource(properties = {"HOSTNAME=35.229.87.236", "PORT=80", "spring.kafka.bootstrap-servers=localhost:3333"})
 public class RunnerTest {
 
@@ -41,9 +43,15 @@ public class RunnerTest {
 
 
     @Test
-    public void main() {
+    public void main() throws InterruptedException {
 
-        extractor.forwardBitcoinBlocks(1L, 100L);
+        Disposable d = extractor.forwardBitcoinBlocks(1L, 100L);
+
+        while (!d.isDisposed()) {
+            Thread.sleep(1000L);
+        }
+
+
         // mockServer
         //         .when(
         //                 request()
