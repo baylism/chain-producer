@@ -35,14 +35,7 @@ public class RESTClient {
 
     private ReactiveHTTPClient client;
 
-    public RESTClient() {
-
-        // client = new ReactiveHTTPClient(hostName, port);
-
-        // hostName = "35.229.87.236";
-        // port = 80;
-
-    }
+    public RESTClient() { }
 
     @PostConstruct
     public void buildClient() {
@@ -77,7 +70,7 @@ public class RESTClient {
 
 
     /**
-     * get the current state of the transactino pool
+     * get the current state of the transaction pool
      */
     public Mono<String> getTransactionPool(Blockchain blockchain) {
 

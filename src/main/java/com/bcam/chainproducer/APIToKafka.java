@@ -3,7 +3,6 @@ package com.bcam.chainproducer;
 import com.bcam.bcmonitor.model.Blockchain;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -39,31 +38,31 @@ public class APIToKafka {
     }
 
 
-    public Disposable forwardBlocks(Blockchain blockchain, Long fromHeight, Long toHeight) {
+    public Flux<?> forwardBlocks(Blockchain blockchain, Long fromHeight, Long toHeight) {
 
         Flux<String> blocksString = client
                 .getBlocksFlux(blockchain, fromHeight, toHeight);
 
-        return kafkaProducer.send(blocksString, "blocks", convertChain(blockchain)).subscribe();
+        return kafkaProducer.send(blocksString, "blocks", convertChain(blockchain));
     }
 
 
     // ======= Pool =======
 
-    public Disposable forwardTransactionPool(Blockchain blockchain) {
+    public Flux<?> forwardTransactionPool(Blockchain blockchain) {
 
         Mono<String> pools = client.getTransactionPool(blockchain);
 
-        return kafkaProducer.send(pools, "pool-tx", "BITCOIN").subscribe();
+        return kafkaProducer.send(pools, "pool-tx", "BITCOIN");
 
     }
 
-    public Disposable forwardTransactionPoolContunuous(Blockchain blockchain) {
+    public Flux<?> forwardTransactionPoolContunuous(Blockchain blockchain) {
 
         Flux<String> pools = Flux.interval(Duration.ofMillis(500))
                 .flatMap(x -> client.getTransactionPool(blockchain));
 
-        return kafkaProducer.send(pools, "pool-tx", "BITCOIN").subscribe();
+        return kafkaProducer.send(pools, "pool-tx", "BITCOIN");
 
     }
 
