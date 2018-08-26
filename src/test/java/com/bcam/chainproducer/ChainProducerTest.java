@@ -6,9 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import reactor.core.Disposable;
-
-import java.util.ArrayList;
 
 import static com.bcam.bcmonitor.model.Blockchain.BITCOIN;
 
@@ -24,8 +21,7 @@ public class ChainProducerTest {
 
 
     @Test
-    public void main() throws InterruptedException {
-
+    public void main() {
 
         APIToKafka
                 .forwardBlocks(BITCOIN, 1L, 10L)
@@ -34,7 +30,6 @@ public class ChainProducerTest {
         APIToKafka
                 .forwardTransactionPoolContunuous(BITCOIN)
                 .blockLast();
-
 
 
     }
