@@ -23,14 +23,13 @@ public class ChainProducerTest {
     @Test
     public void main() {
 
-        APIToKafka
-                .forwardBlocks(BITCOIN, 1L, 10L)
-                .blockLast();
+        // APIToKafka
+        //         .forwardBlocks(BITCOIN, 1L, 10L)
+        //         .blockLast();
 
         APIToKafka
-                .forwardTransactionPoolContunuous(BITCOIN)
+                .forwardTransactionPoolContunuous(BITCOIN, 4000L)
                 .blockLast();
-
 
     }
 }

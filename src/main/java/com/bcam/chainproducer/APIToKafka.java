@@ -57,9 +57,9 @@ public class APIToKafka {
 
     }
 
-    public Flux<?> forwardTransactionPoolContunuous(Blockchain blockchain) {
+    public Flux<?> forwardTransactionPoolContunuous(Blockchain blockchain, Long intervalMillis) {
 
-        Flux<String> pools = Flux.interval(Duration.ofMillis(500))
+        Flux<String> pools = Flux.interval(Duration.ofMillis(intervalMillis))
                 .flatMap(x -> client.getTransactionPool(blockchain));
 
         return kafkaProducer.send(pools, "pool-tx", "BITCOIN");
