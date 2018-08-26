@@ -1,28 +1,23 @@
 package com.bcam.chainproducer;
 
-import org.junit.After;
-import org.junit.Before;
+import com.bcam.bcmonitor.model.Blockchain;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockserver.integration.ClientAndServer;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import reactor.core.Disposable;
 
-import static org.mockserver.integration.ClientAndServer.startClientAndServer;
-import static org.mockserver.model.HttpRequest.request;
-import static org.mockserver.model.HttpResponse.response;
+import static com.bcam.bcmonitor.model.Blockchain.BITCOIN;
 
 // hostName = "35.229.87.236";
 // port = 80;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
-@TestPropertySource(properties = {"HOSTNAME=35.229.87.236", "PORT=80", "spring.kafka.bootstrap-servers=localhost:3333"})
-public class RunnerTest {
+@TestPropertySource(properties = {"HOSTNAME=35.229.87.236", "PORT=80", "spring.kafka.bootstrap-servers=localhost:9092"})
+public class ChainProducerTest {
 
     // private ClientAndServer mockServer;
     //
@@ -39,15 +34,21 @@ public class RunnerTest {
     // }
 
     @Autowired
-    private Extractor extractor;
+    private APIToKafka APIToKafka;
 
 
     @Test
     public void main() throws InterruptedException {
 
-        Disposable d = extractor.forwardBitcoinBlocks(1L, 100L);
+        Disposable d = APIToKafka.forwardBlocks(BITCOIN, 1L, 10L);
 
-        while (!d.isDisposed()) {
+        Disposable e = APIToKafka.forwardTransactionPool(BITCOIN);
+
+        // Disposable d = APIToKafka.forwardTransactionPool(Blockchain.BITCOIN);
+
+
+
+        while (!(d.isDisposed() && e.isDisposed()) ) {
             Thread.sleep(1000L);
         }
 

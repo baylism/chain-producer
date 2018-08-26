@@ -15,6 +15,13 @@ import static com.bcam.bcmonitor.model.Blockchain.BITCOIN;
 import static com.bcam.bcmonitor.model.Blockchain.DASH;
 import static com.bcam.bcmonitor.model.Blockchain.ZCASH;
 
+
+/**
+ *
+ * for live data use, https://github.com/spring-projects/spring-data-examples/tree/master/mongodb/change-streams#reactive-style
+ *
+ *
+ */
 @Component
 public class RESTClient {
 
@@ -44,13 +51,45 @@ public class RESTClient {
         client = new ReactiveHTTPClient(hostName, port);
     }
 
-    public Flux<BitcoinBlock> getBlocksFlux(Blockchain blockchain, Long fromHeight, Long toHeight) {
+
+    /**
+     * open a stream of blocks from fromheight to tohieght
+     */
+    public Flux<String> getBlocksFlux(Blockchain blockchain, Long fromHeight, Long toHeight) {
+
         return client
                 .getResponseSpec(convertChain(blockchain), "blocks", fromHeight.toString(), toHeight.toString())
-                .bodyToFlux(BitcoinBlock.class);
+                .bodyToFlux(String.class);
+
     }
 
+
+    /**
+     * open a stream of blocks form fromheight to the latest known height
+     */
+    public Flux<String> getBlocksFlux(Blockchain blockchain, Long fromHeight) {
+
+        return client
+                .getResponseSpec(convertChain(blockchain), "blocks", fromHeight.toString())
+                .bodyToFlux(String.class);
+
+    }
+
+
+    /**
+     * get the current state of the transactino pool
+     */
+    public Mono<String> getTransactionPool(Blockchain blockchain) {
+
+        return client
+                .getResponseSpec(convertChain(blockchain), "transactionpool")
+                .bodyToMono(String.class);
+
+    }
+
+
     private String convertChain(Blockchain blockchain) {
+
         switch (blockchain) {
             case BITCOIN: return "bitcoin";
             case ZCASH: return "zcash";

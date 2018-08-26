@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.kafka.sender.KafkaSender;
 import reactor.kafka.sender.SenderOptions;
 import reactor.kafka.sender.SenderRecord;
@@ -83,6 +84,23 @@ public class ReactiveKafkaProducer {
 
 
     public Flux<?> send(Flux<String> source, String topic, String key) {
+
+        return sender
+                .send(
+                        source
+                                .doOnNext(x -> logger.info("Got item from source " + x))
+                                .map(s -> SenderRecord.create(new ProducerRecord<>(topic, key, s), key))
+                )
+                .doOnError(e -> logger.error("Send failed, terminating.", e))
+                .doOnNext(record -> {
+                    String correlationMetadata = record.correlationMetadata();
+                    RecordMetadata metadata = record.recordMetadata();
+                    logger.info("Successfully stored block with id " + correlationMetadata + " and record " + metadata + " in Kafka");
+                })
+                .doOnCancel(sender::close);
+    }
+
+    public Flux<?> send(Mono<String> source, String topic, String key) {
 
         return sender
                 .send(
