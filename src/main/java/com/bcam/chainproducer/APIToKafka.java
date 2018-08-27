@@ -70,7 +70,7 @@ public class APIToKafka {
 
     private void updateTip(Blockchain blockchain) {
 
-        if (!enableTracking.get(blockchain)) {
+        if (!enableTracking.get(blockchain) || (tips.get(blockchain) < 0)) {
             return;
         }
 
@@ -105,7 +105,6 @@ public class APIToKafka {
     }
 
 
-
     // ============================ Pool ============================
 
     @Scheduled(fixedDelay = 5000L)
@@ -114,6 +113,7 @@ public class APIToKafka {
         tips.forEachKey(Long.MAX_VALUE, this::forwardTransactionPool);
 
     }
+
 
     private void forwardTransactionPool(Blockchain blockchain) {
 
@@ -127,6 +127,7 @@ public class APIToKafka {
 
     }
 
+
     public Flux<?> forwardTransactionPoolContunuous(Blockchain blockchain, Long intervalMillis) {
 
         Flux<String> pools = Flux.interval(Duration.ofMillis(intervalMillis))
@@ -136,7 +137,8 @@ public class APIToKafka {
 
     }
 
-    // ======= Helpers =======
+
+    // ============================ Helpers ============================
 
     private String convertChain(Blockchain blockchain) {
 
