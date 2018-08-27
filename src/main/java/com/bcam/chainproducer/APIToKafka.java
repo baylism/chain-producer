@@ -1,25 +1,20 @@
 package com.bcam.chainproducer;
 
-import com.bcam.bcmonitor.model.BitcoinBlock;
 import com.bcam.bcmonitor.model.Blockchain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.bcam.bcmonitor.model.Blockchain.BITCOIN;
-import static com.bcam.bcmonitor.model.Blockchain.DASH;
-import static com.bcam.bcmonitor.model.Blockchain.ZCASH;
+import static com.bcam.bcmonitor.model.Blockchain.*;
 
 @Component
 public class APIToKafka {
