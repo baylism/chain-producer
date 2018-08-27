@@ -28,8 +28,12 @@ public class ChainProducerTest {
         //         .blockLast();
 
         APIToKafka
-                .forwardTransactionPoolContunuous(BITCOIN, 4000L)
+                .forwadBlocksContinuous(BITCOIN, 500000L)
                 .blockLast();
+
+        // APIToKafka
+        //         .forwardTransactionPoolContunuous(BITCOIN, 4000L)
+        //         .blockLast();
 
     }
 }

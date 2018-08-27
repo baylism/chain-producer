@@ -58,14 +58,32 @@ public class RESTClient {
 
 
     /**
-     * open a stream of blocks form fromheight to the latest known height
+     * open a stream of blocks form fromheight
      */
-    public Flux<String> getBlocksFlux(Blockchain blockchain, Long fromHeight) {
+    public Flux<String> getBlocksLatest(Blockchain blockchain, Long fromHeight) {
 
         return client
                 .getResponseSpec(convertChain(blockchain), "blocks", fromHeight.toString())
                 .bodyToFlux(String.class);
 
+    }
+
+    /**
+     * open a continuous stream of blocks form fromheight
+     */
+    public Mono<String> getBlock(Blockchain blockchain, Long height) {
+
+        return client
+                .getResponseSpec(convertChain(blockchain), "blocks", height.toString())
+                .bodyToMono(String.class);
+
+    }
+
+    public Mono<Long> getBestHeight(Blockchain blockchain) {
+
+        return client
+                .getResponseSpec(convertChain(blockchain), "blocks", "bestblockheight")
+                .bodyToMono(Long.class);
     }
 
 
