@@ -26,7 +26,7 @@ import java.util.Map;
 @Component
 public class ReactiveKafkaProducer {
 
-    @Value("${spring.kafka.bootstrap-servers}")
+    @Value("${KAFKA_BOOTSTRAP_SERVERS}")
     private String bootstrapServers;
 
     private static final Logger logger = LoggerFactory.getLogger(ReactiveKafkaProducer.class);

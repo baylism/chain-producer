@@ -43,7 +43,7 @@ public class APIToKafka {
 
         enableTracking = new HashMap<>();
         enableTracking.put(BITCOIN, Boolean.FALSE);
-        enableTracking.put(DASH, Boolean.FALSE);
+        enableTracking.put(DASH, Boolean.TRUE);
         enableTracking.put(ZCASH, Boolean.FALSE);
 
         enablePool = new HashMap<>();
@@ -65,7 +65,7 @@ public class APIToKafka {
 
     private void updateTip(Blockchain blockchain) {
 
-        if (!enableTracking.get(blockchain) || (tips.get(blockchain) < 0)) {
+        if (!enableTracking.get(blockchain)) {
             return;
         }
 
@@ -91,6 +91,7 @@ public class APIToKafka {
     }
 
 
+    // one-off
     public Flux<?> forwardBlocks(Blockchain blockchain, Long fromHeight, Long toHeight) {
 
         Flux<String> blocksString = client
@@ -123,6 +124,7 @@ public class APIToKafka {
     }
 
 
+    // one-off
     public Flux<?> forwardTransactionPoolContunuous(Blockchain blockchain, Long intervalMillis) {
 
         Flux<String> pools = Flux.interval(Duration.ofMillis(intervalMillis))

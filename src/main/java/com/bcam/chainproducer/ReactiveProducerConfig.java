@@ -19,7 +19,7 @@ public class ReactiveProducerConfig {
     private static final Logger logger = LoggerFactory.getLogger(ReactiveProducerConfig.class);
 
 
-    @Value("${spring.kafka.bootstrap-servers}")
+    @Value("${KAFKA_BOOTSTRAP_SERVERS}")
     private String bootstrapServers;
 
 

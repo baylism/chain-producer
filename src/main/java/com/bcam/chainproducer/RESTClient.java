@@ -58,7 +58,7 @@ public class RESTClient {
 
 
     /**
-     * open a stream of blocks form fromheight
+     * open a stream of blocks from fromheight
      */
     public Flux<String> getBlocksLatest(Blockchain blockchain, Long fromHeight) {
 
@@ -82,7 +82,7 @@ public class RESTClient {
     public Mono<Long> getBestHeight(Blockchain blockchain) {
 
         return client
-                .getResponseSpec(convertChain(blockchain), "blocks", "bestblockheight")
+                .getResponseSpec(convertChain(blockchain),  "bestblockheight")
                 .bodyToMono(Long.class);
     }
 

@@ -50,7 +50,8 @@ public class ReactiveKafkaProducerTest {
 
     @BeforeClass
     public static void setUpBeforeClass() {
-        System.setProperty("spring.kafka.bootstrap-servers", embeddedKafka.getBrokersAsString());
+        // System.setProperty("spring.kafka.bootstrap-servers", embeddedKafka.getBrokersAsString());
+        System.setProperty("KAFKA_BOOTSTRAP_SERVERS", embeddedKafka.getBrokersAsString());
 
         logger.info("Beforeclass " + embeddedKafka.getBrokersAsString());
     }

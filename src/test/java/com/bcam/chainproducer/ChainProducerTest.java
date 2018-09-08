@@ -12,7 +12,7 @@ import static com.bcam.bcmonitor.model.Blockchain.BITCOIN;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
-@TestPropertySource(properties = {"HOSTNAME=35.229.87.236", "PORT=80", "spring.kafka.bootstrap-servers=localhost:9092"})
+@TestPropertySource(properties = {"HOSTNAME=35.229.87.236", "PORT=80", "KAFKA_BOOTSTRAP_SERVERS=localhost:9092"})
 public class ChainProducerTest {
 
 
@@ -27,10 +27,12 @@ public class ChainProducerTest {
         //         .forwardBlocks(BITCOIN, 1L, 10L)
         //         .blockLast();
 
-        APIToKafka
-                .forwadBlocksContinuous(BITCOIN, 500000L)
-                .blockLast();
-
+        // APIToKafka
+        //         .forwardBlocks(BITCOIN, 500000L, 500002L)
+        //         .blockLast();
+        //
+        // APIToKafka
+        //         .
         // APIToKafka
         //         .forwardTransactionPoolContunuous(BITCOIN, 4000L)
         //         .blockLast();

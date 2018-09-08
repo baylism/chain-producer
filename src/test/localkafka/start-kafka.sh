@@ -1,8 +1,8 @@
 #!/bin/bash
 
 KAFKA=/Users/maxbaylis/msc-project/kafka_2.11-1.1.0
-TOPIC=info
-TOPIC2=blocks
+TOPIC=blocks
+TOPIC2=pool-tx
 
 
 tmux kill-session -t kafka-start
@@ -26,8 +26,8 @@ tmux send-keys "$KAFKA/bin/kafka-server-start.sh $KAFKA/config/server.properties
 
 # Create topics and verify
 tmux select-pane -t 2
-tmux send-keys "$KAFKA/bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic $TOPIC" C-m
-tmux send-keys "$KAFKA/bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic $TOPIC2" C-m
+tmux send-keys "$KAFKA/bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 3 --topic $TOPIC" C-m
+tmux send-keys "$KAFKA/bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 3 --topic $TOPIC2" C-m
 
 tmux send-keys "$KAFKA/bin/kafka-topics.sh --list --zookeeper localhost:2181" C-m
 
