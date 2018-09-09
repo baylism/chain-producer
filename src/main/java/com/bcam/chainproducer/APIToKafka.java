@@ -48,7 +48,7 @@ public class APIToKafka {
 
         enablePool = new HashMap<>();
         enablePool.put(BITCOIN, Boolean.FALSE);
-        enablePool.put(DASH, Boolean.FALSE);
+        enablePool.put(DASH, Boolean.TRUE);
         enablePool.put(ZCASH, Boolean.FALSE);
 
     }
@@ -76,11 +76,13 @@ public class APIToKafka {
             // if tip has progressed, send new blocks to kafka
             if (newTip > oldTip) {
 
-                Flux<String> newBlock = client.getBlocksLatest(blockchain, oldTip + 1);
-                kafkaProducer.send(newBlock, "blocks", convertChain(blockchain));
+                forwardBlocks(blockchain, oldTip + 1).blockLast();
+
+                logger.info("Updated kafka blocks for " + blockchain + " to height " + newTip);
 
                 tips.put(blockchain, newTip);
-                logger.info("Updated kafka blocks for " + blockchain + " to height " + newTip);
+                logger.info("Updated tip for " + blockchain + " to height " + newTip);
+
             }
 
         } catch (Exception e){
@@ -95,7 +97,16 @@ public class APIToKafka {
     public Flux<?> forwardBlocks(Blockchain blockchain, Long fromHeight, Long toHeight) {
 
         Flux<String> blocksString = client
-                .getBlocksFlux(blockchain, fromHeight, toHeight);
+                .getBlocks(blockchain, fromHeight, toHeight);
+
+        return kafkaProducer.send(blocksString, "blocks", convertChain(blockchain));
+    }
+
+    // one-off
+    public Flux<?> forwardBlocks(Blockchain blockchain, Long fromHeight) {
+
+        Flux<String> blocksString = client
+                .getBlocks(blockchain, fromHeight);
 
         return kafkaProducer.send(blocksString, "blocks", convertChain(blockchain));
     }
@@ -113,13 +124,13 @@ public class APIToKafka {
 
     private void forwardTransactionPool(Blockchain blockchain) {
 
-        if (!enablePool.get(blockchain)) {
+        if (! enablePool.get(blockchain)) {
             return;
         }
 
         Mono<String> pools = client.getTransactionPool(blockchain);
 
-        kafkaProducer.send(pools, "pool-tx", convertChain(blockchain));
+        kafkaProducer.send(pools, "pool-tx", convertChain(blockchain)).blockLast();
 
     }
 

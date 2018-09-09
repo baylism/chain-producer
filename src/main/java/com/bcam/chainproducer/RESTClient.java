@@ -48,7 +48,7 @@ public class RESTClient {
     /**
      * open a stream of blocks from fromheight to tohieght
      */
-    public Flux<String> getBlocksFlux(Blockchain blockchain, Long fromHeight, Long toHeight) {
+    public Flux<String> getBlocks(Blockchain blockchain, Long fromHeight, Long toHeight) {
 
         return client
                 .getResponseSpec(convertChain(blockchain), "blocks", fromHeight.toString(), toHeight.toString())
@@ -60,7 +60,7 @@ public class RESTClient {
     /**
      * open a stream of blocks from fromheight
      */
-    public Flux<String> getBlocksLatest(Blockchain blockchain, Long fromHeight) {
+    public Flux<String> getBlocks(Blockchain blockchain, Long fromHeight) {
 
         return client
                 .getResponseSpec(convertChain(blockchain), "blocks", fromHeight.toString())

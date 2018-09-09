@@ -84,6 +84,7 @@ public class ReactiveKafkaProducer {
 
 
     public Flux<?> send(Flux<String> source, String topic, String key) {
+        logger.info("About to send " + topic + key);
 
         return sender
                 .send(

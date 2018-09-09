@@ -8,6 +8,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static com.bcam.bcmonitor.model.Blockchain.BITCOIN;
+import static com.bcam.bcmonitor.model.Blockchain.DASH;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -31,8 +32,9 @@ public class ChainProducerTest {
         //         .forwardBlocks(BITCOIN, 500000L, 500002L)
         //         .blockLast();
         //
-        // APIToKafka
-        //         .
+        APIToKafka
+                .forwardBlocks(DASH, 934423L).blockLast();
+
         // APIToKafka
         //         .forwardTransactionPoolContunuous(BITCOIN, 4000L)
         //         .blockLast();
