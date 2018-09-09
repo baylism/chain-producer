@@ -27,11 +27,11 @@ public class APIToKafka {
 
 
     private RESTClient client;
-    private ReactiveKafkaProducer kafkaProducer;
+    private ReactiveKafkaProducerTyped kafkaProducer;
 
 
     @Autowired
-    public APIToKafka(RESTClient client, ReactiveKafkaProducer kafkaProducer) {
+    public APIToKafka(RESTClient client, ReactiveKafkaProducerTyped kafkaProducer) {
 
         this.client = client;
         this.kafkaProducer = kafkaProducer;
@@ -65,13 +65,19 @@ public class APIToKafka {
 
     private void updateTip(Blockchain blockchain) {
 
-        if (!enableTracking.get(blockchain)) {
+        if (! enableTracking.get(blockchain)) {
             return;
         }
 
         try {
             Long newTip = client.getBestHeight(blockchain).block();
             Long oldTip = tips.get(blockchain);
+
+            // first time run for this blockchain. Just save the current tip.
+            if (oldTip == -1) {
+                tips.put(blockchain, newTip);
+                return;
+            }
 
             // if tip has progressed, send new blocks to kafka
             if (newTip > oldTip) {
@@ -99,7 +105,7 @@ public class APIToKafka {
         Flux<String> blocksString = client
                 .getBlocks(blockchain, fromHeight, toHeight);
 
-        return kafkaProducer.send(blocksString, "blocks", convertChain(blockchain));
+        return kafkaProducer.send(blocksString, "blocks", blockchain);
     }
 
     // one-off
@@ -108,7 +114,7 @@ public class APIToKafka {
         Flux<String> blocksString = client
                 .getBlocks(blockchain, fromHeight);
 
-        return kafkaProducer.send(blocksString, "blocks", convertChain(blockchain));
+        return kafkaProducer.send(blocksString, "blocks", blockchain);
     }
 
 
@@ -130,7 +136,7 @@ public class APIToKafka {
 
         Mono<String> pools = client.getTransactionPool(blockchain);
 
-        kafkaProducer.send(pools, "pool-tx", convertChain(blockchain)).blockLast();
+        kafkaProducer.send(pools, "pool-tx", blockchain).blockLast();
 
     }
 
@@ -141,22 +147,22 @@ public class APIToKafka {
         Flux<String> pools = Flux.interval(Duration.ofMillis(intervalMillis))
                 .flatMap(x -> client.getTransactionPool(blockchain));
 
-        return kafkaProducer.send(pools, "pool-tx", "BITCOIN");
+        return kafkaProducer.send(pools, "pool-tx", blockchain);
 
     }
 
 
     // ============================ Helpers ============================
-
-    private String convertChain(Blockchain blockchain) {
-
-        switch (blockchain) {
-                case BITCOIN: return "BITCOIN";
-            case ZCASH: return "ZCASH";
-            case DASH: return "DASH";
-            default: throw new RuntimeException("Can't convert blockchain");
-        }
-    }
+    //
+    // private String convertChain(Blockchain blockchain) {
+    //
+    //     switch (blockchain) {
+    //             case BITCOIN: return "BITCOIN";
+    //         case ZCASH: return "ZCASH";
+    //         case DASH: return "DASH";
+    //         default: throw new RuntimeException("Can't convert blockchain");
+    //     }
+    // }
 
 
 }

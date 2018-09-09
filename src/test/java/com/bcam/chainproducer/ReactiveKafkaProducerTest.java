@@ -1,5 +1,6 @@
 package com.bcam.chainproducer;
 
+import com.bcam.bcmonitor.model.Blockchain;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -19,6 +20,7 @@ import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.test.rule.KafkaEmbedded;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
@@ -28,6 +30,7 @@ import java.util.Map;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @DirtiesContext
+@TestPropertySource(properties = {"HOSTNAME=35.229.87.236", "PORT=80", "KAFKA_BOOTSTRAP_SERVERS=localhost:9092"})
 public class ReactiveKafkaProducerTest {
 
     private static final Logger logger = LoggerFactory.getLogger(ReactiveKafkaProducerTest.class);
@@ -43,7 +46,7 @@ public class ReactiveKafkaProducerTest {
 
 
     @Autowired
-    private ReactiveKafkaProducer producer;
+    private ReactiveKafkaProducerTyped producer;
 
     @Autowired
     private Map<String, Object> producerProps;
@@ -68,8 +71,6 @@ public class ReactiveKafkaProducerTest {
         String block2 = "{\"hash\":\"0000000082b5015589a3fdf2d4baff403e6f0be035a5d9742c1cae6295464449\",\"prevBlockHash\":\"000000006a625f06636b8bb6ac7b960a8d03705d1ace08b1a19da3fdcc99ddbd\",\"height\":3,\"timeStamp\":1231470173,\"sizeBytes\":215,\"difficulty\":1,\"timeReceived\":1535205363,\"txids\":[\"999e1c837c76a1b7fbb7e57baf87b309960f5ffefbf2a9b95dd890602272f644\"],\"medianTime\":0,\"chainWork\":17180131332,\"confirmations\":538399}";
 
 
-
-
         //    create producer and produce
 
         Flux<String> source = Flux.just(block1, block2);
@@ -78,7 +79,7 @@ public class ReactiveKafkaProducerTest {
         // producer.rebuildSender();
 
 
-        Disposable result = producer.send(source, TOPIC, "BITCOIN").subscribe();
+        Disposable result = producer.send(source, TOPIC, Blockchain.BITCOIN).subscribe();
 
 
         while (! result.isDisposed()) {
