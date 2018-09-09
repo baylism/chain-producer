@@ -51,7 +51,7 @@ tmux attach-session -t kafka-start
 #$KAFKA/bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 3  --config retention.ms=10000 --topic $TOPIC
 
 # :)
-#$KAFKA/bin/kafka-configs.sh --zookeeper localhost:2181 --entity-type topics --alter --add-config retention.ms=60 --entity-name blocks
+#$KAFKA/bin/kafka-configs.sh --zookeeper localhost:2181 --entity-type topics --alter --add-config retention.ms=60000 --entity-name blocks
 
 
 # $KAFKA/bin/kafka-topics.sh --zookeeper localhost:2181 --alter --topic pool-tx --config retention.ms=10000
